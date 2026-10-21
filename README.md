@@ -6,12 +6,16 @@
 
 **Complete Desktop Graphical Interface for Google Antigravity CLI (`agy`) featuring Antigravity 2.0 Visual Identity**
 
-[![Version](https://img.shields.io/badge/version-1.3.5-blue.svg)](package.json)
+[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](package.json)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](package.json)
 [![Electron](https://img.shields.io/badge/Electron-34.2-47848F?logo=electron&logoColor=white)](https://www.electronjs.org/)
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?logo=react&logoColor=black)](https://react.dev/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Vite](https://img.shields.io/badge/Vite-6.1-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
+
+<br/><br/>
+
+<img src="docs/screenshot.png" alt="Antigravity CLI Studio Running" width="100%" />
 
 </div>
 
