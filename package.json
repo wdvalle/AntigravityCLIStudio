@@ -1,0 +1,91 @@
+{
+  "name": "antigravity-cli-gui",
+  "version": "1.3.5",
+  "description": "Complete Cross-Platform Desktop GUI for Google Antigravity CLI (agy) with Antigravity 2.0 Visual Style",
+  "main": "dist-electron/electron/main.js",
+  "author": "Antigravity GUI",
+  "license": "MIT",
+  "scripts": {
+    "dev:vite": "vite --port 5173",
+    "dev:server": "tsx watch server/index.ts",
+    "dev:electron": "tsc -p tsconfig.electron.json && electron .",
+    "dev": "concurrently -k \"npm run dev:server\" \"npm run dev:vite\"",
+    "app": "concurrently -k \"npm run dev:server\" \"npm run dev:vite\" \"wait-on http://localhost:5173 && npm run dev:electron\"",
+    "build:web": "vite build",
+    "build:electron": "tsc -p tsconfig.electron.json",
+    "build": "npm run build:web && npm run build:electron",
+    "dist:linux": "npm run build && electron-builder --linux",
+    "dist:win": "npm run build && electron-builder --win",
+    "dist:mac": "npm run build && electron-builder --mac",
+    "dist:all": "npm run build && electron-builder -mwl"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "lucide-react": "^0.475.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.13.4",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "@vitejs/plugin-react": "^4.3.4",
+    "concurrently": "^9.1.2",
+    "electron": "^34.2.0",
+    "electron-builder": "^25.1.8",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.3",
+    "vite": "^6.1.0",
+    "wait-on": "^8.0.2"
+  },
+  "build": {
+    "appId": "com.antigravity.cli.gui",
+    "productName": "Antigravity CLI Studio",
+    "directories": {
+      "output": "release",
+      "buildResources": "public"
+    },
+    "files": [
+      "dist/**/*",
+      "dist-electron/**/*",
+      "package.json"
+    ],
+    "linux": {
+      "target": [
+        "AppImage",
+        "deb",
+        "tar.gz"
+      ],
+      "category": "Development",
+      "synopsis": "Antigravity CLI Desktop GUI",
+      "desktop": {
+        "Name": "Antigravity CLI Studio",
+        "Comment": "Graphical User Interface for Google Antigravity CLI (agy)",
+        "Categories": "Development;IDE;"
+      }
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable",
+        "zip"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.developer-tools",
+      "darkModeSupport": true
+    }
+  }
+}
