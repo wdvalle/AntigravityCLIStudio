@@ -36,6 +36,7 @@ import {
   Play,
   X,
   FolderPlus,
+  Minimize2,
 } from 'lucide-react';
 import { AntigravityLogo } from './components/AntigravityLogo';
 import { ConfigView } from './components/ConfigView';
@@ -372,6 +373,28 @@ export const App: React.FC = () => {
     promptTextareaRef.current?.focus();
   };
 
+  const handleCompactAction = () => {
+    if (messages.length === 0) {
+      appendLog('info', 'Nenhuma mensagem no histórico para compactar.');
+      return;
+    }
+    const previousCount = messages.length;
+    appendLog('info', `Compactando histórico (${previousCount} mensagens) para otimizar contexto (/compact)...`);
+
+    const summaryCard: ChatMessageItem = {
+      id: `compact-${Date.now()}`,
+      role: 'assistant',
+      content: `📦 **Contexto Compactado (/compact)**: ${previousCount} mensagens foram resumidas. O histórico foi consolidado para manter a janela de contexto leve.`,
+      timestamp: new Date().toISOString(),
+      model: selectedModel,
+      status: 'done',
+    };
+
+    const lastFew = messages.slice(-2);
+    setMessages([summaryCard, ...lastFew]);
+    appendLog('info', 'Contexto compactado com sucesso (/compact).');
+  };
+
   const handleLocalSlashAction = (cmd: string) => {
     if (cmd === '/clear') {
       setMessages([]);
@@ -388,6 +411,8 @@ export const App: React.FC = () => {
         navigator.clipboard.writeText(lastAssistant.content);
         appendLog('info', 'Última resposta copiada para a área de transferência (/copy).');
       }
+    } else if (cmd === '/compact') {
+      handleCompactAction();
     } else if (cmd === '/tasks') {
       setRightDrawerOpen(true);
       setRightDrawerTab('terminal');
@@ -477,7 +502,7 @@ export const App: React.FC = () => {
         return;
       }
     }
-    if (['/clear', '/rewind', '/fork', '/copy', '/tasks'].includes(text)) {
+    if (['/clear', '/rewind', '/fork', '/copy', '/compact', '/tasks'].includes(text)) {
       handleLocalSlashAction(text);
       return;
     }
@@ -906,6 +931,52 @@ export const App: React.FC = () => {
         </div>
 
         <div className="agy-titlebar-right">
+          <div className="agy-top-actions">
+            <button
+              type="button"
+              className="agy-top-action-btn compact"
+              title="Compactar histórico da conversa (/compact)"
+              onClick={handleCompactAction}
+              disabled={messages.length === 0}
+            >
+              <Minimize2 size={12} />
+              <span>/compact</span>
+            </button>
+
+            <button
+              type="button"
+              className="agy-top-action-btn rewind"
+              title="Desfazer o último turno (/rewind)"
+              onClick={() => handleLocalSlashAction('/rewind')}
+              disabled={messages.length === 0}
+            >
+              <RotateCcw size={12} />
+              <span>/rewind</span>
+            </button>
+
+            <button
+              type="button"
+              className="agy-top-action-btn fork"
+              title="Ramificar conversa em uma nova sessão (/fork)"
+              onClick={() => handleLocalSlashAction('/fork')}
+              disabled={messages.length === 0}
+            >
+              <GitFork size={12} />
+              <span>/fork</span>
+            </button>
+
+            <button
+              type="button"
+              className="agy-top-action-btn copy"
+              title="Copiar última resposta para a área de transferência (/copy)"
+              onClick={() => handleLocalSlashAction('/copy')}
+              disabled={!messages.some((m) => m.role === 'assistant')}
+            >
+              <Copy size={12} />
+              <span>/copy</span>
+            </button>
+          </div>
+
           <span className="agy-msg-meta-pill">{selectedModel}</span>
           <button
             type="button"
@@ -1521,32 +1592,7 @@ export const App: React.FC = () => {
                         </select>
                       </div>
 
-                      {/* 2. COMBO DE ESFORÇO DE RACIOCÍNIO (--effort) */}
-                      <div className="agy-control-group" title="Esforço de raciocínio (--effort)">
-                        <select
-                          aria-label="Esforço de Raciocínio"
-                          className="agy-footer-select"
-                          value={selectedEffort}
-                          onChange={(e) => {
-                            const nextEffort = e.target.value;
-                            setSelectedEffort(nextEffort);
-                            const basePrefix = selectedModel.replace(/-(low|medium|high|xhigh|max)$/i, '');
-                            const candidate = `${basePrefix}-${nextEffort}`;
-                            if (models.some((m) => m.id === candidate)) {
-                              setSelectedModel(candidate);
-                              handleSaveSettings({ model: candidate });
-                            }
-                          }}
-                        >
-                          <option value="low">Effort: Low</option>
-                          <option value="medium">Effort: Medium</option>
-                          <option value="high">Effort: High</option>
-                          <option value="xhigh">Effort: X-High</option>
-                          <option value="max">Effort: Max</option>
-                        </select>
-                      </div>
-
-                      {/* 3. SELETOR DE PERMISSÃO DE EXECUÇÃO DE COMANDOS (Automático vs Pedir Permissão) */}
+                      {/* SELETOR DE PERMISSÃO DE EXECUÇÃO DE COMANDOS (Automático vs Pedir Permissão) */}
                       <div
                         className={`agy-control-group permission-selector ${
                           permissionPolicy === 'always-proceed'

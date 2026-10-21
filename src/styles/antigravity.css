@@ -125,6 +125,63 @@ pre {
   -webkit-app-region: no-drag;
 }
 
+/* Header Slash Action Shortcuts: /compact, /rewind, /fork, /copy */
+.agy-top-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  -webkit-app-region: no-drag;
+  margin-right: 6px;
+}
+
+.agy-top-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px;
+  border-radius: 6px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 140ms ease;
+  user-select: none;
+  -webkit-app-region: no-drag;
+}
+
+.agy-top-action-btn:hover:not(:disabled) {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  border-color: #38384A;
+}
+
+.agy-top-action-btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+.agy-top-action-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.agy-top-action-btn.compact {
+  color: #60A5FA;
+}
+
+.agy-top-action-btn.rewind {
+  color: #FBBF24;
+}
+
+.agy-top-action-btn.fork {
+  color: #A78BFA;
+}
+
+.agy-top-action-btn.copy {
+  color: #34D399;
+}
+
 /* Main App 3-Column Shell */
 .agy-app-shell {
   display: flex;
@@ -139,7 +196,9 @@ pre {
   display: flex;
   flex: 1;
   min-height: 0;
+  height: calc(100vh - 38px);
   width: 100%;
+  overflow: hidden;
 }
 
 /* LEFT SIDEBAR */
@@ -150,8 +209,10 @@ pre {
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
+  max-height: 100%;
   user-select: none;
+  overflow: hidden;
 }
 
 .agy-sidebar-brand {
@@ -376,7 +437,9 @@ pre {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  height: 100vh;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
   background: var(--bg-canvas);
 }
 
@@ -697,7 +760,8 @@ pre {
 
 /* PROMPT COMPOSER & BELOW-PROMPT CONTROL BAR */
 .agy-composer-Dock {
-  padding: 12px 24px 18px;
+  flex-shrink: 0;
+  padding: 8px 24px 12px;
   background: linear-gradient(180deg, transparent 0%, var(--bg-canvas) 30%);
   position: relative;
 }
@@ -1538,7 +1602,9 @@ pre {
   border-left: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 100%;
+  max-height: 100%;
+  overflow: hidden;
 }
 
 .agy-aux-tabs {
