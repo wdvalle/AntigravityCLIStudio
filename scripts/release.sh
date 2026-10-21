@@ -135,7 +135,7 @@ BUILD_LOCAL_CHOICE=${BUILD_LOCAL_CHOICE:-S}
 if [[ "$BUILD_LOCAL_CHOICE" =~ ^[SsYy]$ ]]; then
   echo -e "\n${CYAN}🔨 Compilando aplicação e gerando instaladores locais...${NC}"
   npm run build
-  npx electron-builder --mac
+  npx electron-builder --mac --publish never
   echo -e "${GREEN}✔ Binários locais gerados no diretório release/!${NC}"
   ls -lh release/*.dmg release/*.zip 2>/dev/null || true
 fi

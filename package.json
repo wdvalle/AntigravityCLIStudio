@@ -3,7 +3,10 @@
   "version": "2.0.0",
   "description": "Complete Cross-Platform Desktop GUI for Google Antigravity CLI (agy) with Antigravity 2.0 Visual Style",
   "main": "dist-electron/electron/main.js",
-  "author": "Antigravity GUI",
+  "author": {
+    "name": "Walter do Valle",
+    "email": "walter.valle@gmail.com"
+  },
   "license": "MIT",
   "scripts": {
     "dev:vite": "vite --port 5173",
@@ -56,6 +59,7 @@
       "package.json"
     ],
     "linux": {
+      "maintainer": "Walter do Valle <walter.valle@gmail.com>",
       "target": [
         "AppImage",
         "deb",

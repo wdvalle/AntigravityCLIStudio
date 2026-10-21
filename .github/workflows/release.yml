@@ -42,21 +42,15 @@ jobs:
 
       - name: Build macOS binaries
         if: matrix.platform == 'mac'
-        run: npx electron-builder --mac
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --mac --publish never
 
       - name: Build Linux binaries
         if: matrix.platform == 'linux'
-        run: npx electron-builder --linux
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --linux --publish never
 
       - name: Build Windows binaries
         if: matrix.platform == 'win'
-        run: npx electron-builder --win
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx electron-builder --win --publish never
 
       - name: Upload binaries to GitHub Release
         uses: softprops/action-gh-release@v2
