@@ -1,0 +1,120 @@
+export type SupportedLocale = 'pt-BR' | 'en' | 'es';
+
+export interface TranslationSchema {
+  common: {
+    save: string;
+    cancel: string;
+    close: string;
+    confirm: string;
+    copy: string;
+    copied: string;
+    stop: string;
+    send: string;
+    edit: string;
+    delete: string;
+    loading: string;
+    project: string;
+    active: string;
+    global: string;
+    status: string;
+    error: string;
+  };
+  header: {
+    title: string;
+    projectPrefix: string;
+    sessionPrefix: string;
+    compactTitle: string;
+    rewindTitle: string;
+    forkTitle: string;
+    copyTitle: string;
+    toggleAuxDrawer: string;
+    language: string;
+  };
+  sidebar: {
+    newConversation: string;
+    workspace: string;
+    openOtherFolder: string;
+    cliCommandsSection: string;
+    chatNav: string;
+    configNav: string;
+    permissionsNav: string;
+    modelsNav: string;
+    mcpNav: string;
+    pluginsNav: string;
+    skillsNav: string;
+    agentsNav: string;
+    diffNav: string;
+    conversationsSection: string;
+    noConversations: string;
+    stepsCount: string;
+    newProject: string;
+    allProjects: string;
+  };
+  prompt: {
+    placeholder: string;
+    selectModel: string;
+    commandPermissionTitle: string;
+    commandsAuto: string;
+    commandsAsk: string;
+    commandsSandbox: string;
+    commandsStrict: string;
+    modeTitle: string;
+    modeDefault: string;
+    modeAuto: string;
+    modeAcceptEdits: string;
+    modePlan: string;
+    slashPaletteTitle: string;
+    mentionPaletteTitle: string;
+    mentionFileDesc: string;
+  };
+  terminal: {
+    tabTitle: string;
+    artifactsTab: string;
+    historyTab: string;
+    inputPlaceholder: string;
+    scrollToBottom: string;
+    noArtifacts: string;
+    noHistory: string;
+  };
+  projectModal: {
+    title: string;
+    subtitle: string;
+    nameLabel: string;
+    namePlaceholder: string;
+    folderLabel: string;
+    folderPlaceholder: string;
+    selectFolderBtn: string;
+    execPolicyLabel: string;
+    fileAccessLabel: string;
+    internetAccessLabel: string;
+    sandboxLabel: string;
+    createBtn: string;
+    cancelBtn: string;
+  };
+  config: {
+    title: string;
+    subtitle: string;
+    scopeGlobal: string;
+    scopeProject: string;
+    scopeProjectSubtitle: string;
+    jsonMode: string;
+    visualMode: string;
+    restoreDefaults: string;
+    filterPlaceholder: string;
+    saveSuccess: string;
+    inspectHeadless: string;
+  };
+  messages: {
+    you: string;
+    assistant: string;
+    system: string;
+    permissionRequest: string;
+    thinkingTitle: string;
+    wordsCount: string;
+    executingCli: string;
+    approveOnce: string;
+    approveAlways: string;
+    approveSandbox: string;
+    reject: string;
+  };
+}

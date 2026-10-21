@@ -24,6 +24,7 @@ import {
   AgyProject,
   AgyProjectSettings,
 } from '../types/agy';
+import { useI18n } from '../i18n';
 
 interface ConfigViewProps {
   settings: AgySettings;
@@ -44,6 +45,7 @@ export const ConfigView: React.FC<ConfigViewProps> = ({
   onSaveProjectSettings,
   onRunHeadlessConfig,
 }) => {
+  const { t } = useI18n();
   const [scopeMode, setScopeMode] = useState<'global' | 'project'>('global');
   const [localSettings, setLocalSettings] = useState<AgySettings>(settings);
   const [projectSettings, setProjectSettings] = useState<AgyProjectSettings>(
@@ -301,9 +303,9 @@ export const ConfigView: React.FC<ConfigViewProps> = ({
         <div>
           <div className="agy-panel-title-row">
             <Settings size={20} className="agy-accent-icon" />
-            <h2>Configurações do Antigravity CLI (<code>/config</code>)</h2>
+            <h2>{t('config.title')} (<code>/config</code>)</h2>
             <span className="agy-badge agy-badge-blue">
-              {scopeMode === 'global' ? '36 Opções Globais' : 'Configurações do Projeto'}
+              {scopeMode === 'global' ? '36 Opções' : t('config.scopeProject')}
             </span>
           </div>
           <p className="agy-panel-subtitle">
@@ -322,14 +324,14 @@ export const ConfigView: React.FC<ConfigViewProps> = ({
                 className={`agy-tab-btn ${scopeMode === 'global' ? 'active' : ''}`}
                 onClick={() => setScopeMode('global')}
               >
-                Global (settings.json)
+                {t('config.scopeGlobal')}
               </button>
               <button
                 type="button"
                 className={`agy-tab-btn ${scopeMode === 'project' ? 'active' : ''}`}
                 onClick={() => setScopeMode('project')}
               >
-                Projeto: {activeProject.name}
+                {t('config.scopeProject')}: {activeProject.name}
               </button>
             </div>
           )}
@@ -340,7 +342,7 @@ export const ConfigView: React.FC<ConfigViewProps> = ({
               onClick={onRunHeadlessConfig}
               title="Executar agy -p /config no CLI"
             >
-              <Sparkles size={14} /> Inspecionar <code>agy -p "/config"</code>
+              <Sparkles size={14} /> {t('config.inspectHeadless')}
             </button>
           )}
           <button
@@ -348,7 +350,7 @@ export const ConfigView: React.FC<ConfigViewProps> = ({
             className={`agy-btn ${rawJsonMode ? 'agy-btn-primary' : 'agy-btn-secondary'}`}
             onClick={() => setRawJsonMode(!rawJsonMode)}
           >
-            <FileJson size={14} /> {rawJsonMode ? 'Modo Visual' : 'JSON Bruto'}
+            <FileJson size={14} /> {rawJsonMode ? t('config.visualMode') : t('config.jsonMode')}
           </button>
           {scopeMode === 'global' && (
             <button
@@ -356,7 +358,7 @@ export const ConfigView: React.FC<ConfigViewProps> = ({
               className="agy-btn agy-btn-secondary"
               onClick={handleResetDefaults}
             >
-              <RotateCcw size={14} /> Restaurar Padrões
+              <RotateCcw size={14} /> {t('config.restoreDefaults')}
             </button>
           )}
         </div>
@@ -564,7 +566,7 @@ export const ConfigView: React.FC<ConfigViewProps> = ({
               <Search size={15} />
               <input
                 type="text"
-                placeholder="Filtrar opção de /config (ex: model, vim, sandbox, toolPermission)..."
+                placeholder={t('config.filterPlaceholder')}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

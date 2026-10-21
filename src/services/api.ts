@@ -9,6 +9,7 @@ declare global {
       getBackendUrl: () => Promise<string>;
       openExternal?: (url: string) => Promise<void>;
       openPath?: (path: string) => Promise<void>;
+      getLocale?: () => Promise<string>;
     };
   }
 }

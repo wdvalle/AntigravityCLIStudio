@@ -65,6 +65,10 @@ ipcMain.handle('agy:getBackendUrl', () => {
   return `http://127.0.0.1:${BACKEND_PORT}`;
 });
 
+ipcMain.handle('agy:getLocale', () => {
+  return app.getLocale();
+});
+
 ipcMain.handle('agy:openExternal', async (_, url: string) => {
   if (url) {
     await shell.openExternal(url);

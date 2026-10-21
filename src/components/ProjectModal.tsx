@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { AgyProject, AgyProjectSettings } from '../types/agy';
 import { agyApi } from '../services/api';
+import { useI18n } from '../i18n';
 
 interface ProjectModalProps {
   isOpen: boolean;
@@ -26,6 +27,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
   onProjectCreated,
   initialPath = '',
 }) => {
+  const { t } = useI18n();
   const [name, setName] = useState('');
   const [folderPath, setFolderPath] = useState(initialPath);
   const [permissionPolicy, setPermissionPolicy] = useState<'always-proceed' | 'request-review' | 'proceed-in-sandbox'>('always-proceed');
@@ -54,7 +56,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
   const handleCreate = async () => {
     if (!folderPath.trim()) {
-      setError('Por favor, selecione ou digite a pasta do projeto.');
+      setError(t('projectModal.folderPlaceholder'));
       return;
     }
     setError(null);
@@ -106,7 +108,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
         <div className="agy-modal-header">
           <div className="agy-modal-title">
             <FolderPlus size={18} className="agy-accent-icon" />
-            <span>Criar Novo Projeto Antigravity CLI</span>
+            <span>{t('projectModal.title')}</span>
           </div>
           <button type="button" className="agy-icon-btn-sm" onClick={onClose}>
             <X size={16} />
@@ -118,11 +120,11 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
           {/* Nome do Projeto */}
           <div className="agy-form-field">
-            <label>Nome do Projeto:</label>
+            <label>{t('projectModal.nameLabel')}</label>
             <input
               type="text"
               className="agy-input"
-              placeholder="Ex: meu-projeto-ia"
+              placeholder={t('projectModal.namePlaceholder')}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -130,12 +132,12 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
           {/* Pasta do Projeto */}
           <div className="agy-form-field">
-            <label>Pasta do Projeto no Disco:</label>
+            <label>{t('projectModal.folderLabel')}</label>
             <div className="agy-workspace-add-row" style={{ marginTop: 0 }}>
               <input
                 type="text"
                 className="agy-input"
-                placeholder="/Users/seu-usuario/Desenvolvimento/projeto..."
+                placeholder={t('projectModal.folderPlaceholder')}
                 value={folderPath}
                 onChange={(e) => {
                   setFolderPath(e.target.value);
@@ -149,50 +151,48 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
                 className="agy-btn agy-btn-secondary"
                 onClick={handleSelectFolder}
               >
-                <Folder size={14} /> Procurar...
+                <Folder size={14} /> {t('projectModal.selectFolderBtn')}
               </button>
             </div>
             <span className="agy-form-field-hint">
-              O projeto será salvo no formato oficial do CLI em{' '}
-              <code>~/.gemini/config/projects/&lt;uuid&gt;.json</code> e a pasta será adicionada
-              aos <code>trustedWorkspaces</code>.
+              {t('projectModal.subtitle')}
             </span>
           </div>
 
           {/* Política de Execução por Projeto */}
           <div className="agy-form-field">
-            <label>Política de Execução de Comandos para este Projeto:</label>
+            <label>{t('projectModal.execPolicyLabel')}</label>
             <div className="agy-permission-segmented">
               <button
                 type="button"
                 className={`agy-seg-btn ${permissionPolicy === 'always-proceed' ? 'active success' : ''}`}
                 onClick={() => setPermissionPolicy('always-proceed')}
               >
-                ⚡ Automático (<code>always-proceed</code>)
+                ⚡ {t('prompt.commandsAuto')}
               </button>
               <button
                 type="button"
                 className={`agy-seg-btn ${permissionPolicy === 'request-review' ? 'active warning' : ''}`}
                 onClick={() => setPermissionPolicy('request-review')}
               >
-                ✋ Pedir Permissão (<code>request-review</code>)
+                ✋ {t('prompt.commandsAsk')}
               </button>
               <button
                 type="button"
                 className={`agy-seg-btn ${permissionPolicy === 'proceed-in-sandbox' ? 'active info' : ''}`}
                 onClick={() => setPermissionPolicy('proceed-in-sandbox')}
               >
-                🔒 Sandbox (<code>--sandbox</code>)
+                🔒 {t('prompt.commandsSandbox')}
               </button>
             </div>
           </div>
 
-          {/* Configurações Avançadas por Projeto (salvas no ProjectSettings do CLI) */}
+          {/* Configurações Avançadas por Projeto */}
           <div className="agy-section-card" style={{ padding: 12 }}>
-            <h3 style={{ fontSize: 13, marginBottom: 10 }}>Configurações Scoped do Projeto (CLI ProjectSettings)</h3>
+            <h3 style={{ fontSize: 13, marginBottom: 10 }}>Configurações Scoped (CLI ProjectSettings)</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
               <div className="agy-form-field">
-                <label>Acesso a Arquivos:</label>
+                <label>{t('projectModal.fileAccessLabel')}</label>
                 <select
                   className="agy-select"
                   value={fileAccessPolicy}
@@ -205,7 +205,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
               </div>
 
               <div className="agy-form-field">
-                <label>Acesso à Internet:</label>
+                <label>{t('projectModal.internetAccessLabel')}</label>
                 <select
                   className="agy-select"
                   value={internetPolicy}
@@ -222,7 +222,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
 
         <div className="agy-modal-footer">
           <button type="button" className="agy-btn agy-btn-secondary" onClick={onClose}>
-            Cancelar
+            {t('projectModal.cancelBtn')}
           </button>
           <button
             type="button"
@@ -230,7 +230,7 @@ export const ProjectModal: React.FC<ProjectModalProps> = ({
             onClick={handleCreate}
             disabled={loading || !folderPath.trim()}
           >
-            <Check size={14} /> {loading ? 'Criando Projeto...' : 'Criar Projeto'}
+            <Check size={14} /> {loading ? '...' : t('projectModal.createBtn')}
           </button>
         </div>
       </div>

@@ -38,12 +38,14 @@ import {
   FolderPlus,
   Minimize2,
   ArrowDown,
+  Globe,
 } from 'lucide-react';
 import { AntigravityLogo } from './components/AntigravityLogo';
 import { ConfigView } from './components/ConfigView';
 import { CliModulesView } from './components/CliModulesView';
 import { ProjectModal } from './components/ProjectModal';
 import { MarkdownRenderer } from './components/MarkdownRenderer';
+import { useI18n } from './i18n';
 import {
   AgyModelInfo,
   AgySettings,
@@ -71,6 +73,7 @@ const ThinkingBox: React.FC<{ thinking: string; isStreaming?: boolean }> = ({
   thinking,
   isStreaming,
 }) => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const wordCount = Math.max(1, Math.round(thinking.trim().split(/\s+/).length));
 
@@ -80,13 +83,15 @@ const ThinkingBox: React.FC<{ thinking: string; isStreaming?: boolean }> = ({
         type="button"
         className="agy-thinking-header"
         onClick={() => setOpen(!open)}
-        title={open ? 'Ocultar raciocínio' : 'Expandir raciocínio'}
+        title={open ? t('common.close') : t('messages.thinkingTitle')}
       >
         <div className="agy-thinking-title">
           <Sparkles size={13} className="agy-accent-icon" />
-          <span>Raciocínio do Modelo (Thinking)</span>
-          <span className="agy-thinking-badge">{wordCount} palavras</span>
-          {isStreaming && <span className="agy-live-dot" title="Processando raciocínio..." />}
+          <span>{t('messages.thinkingTitle')}</span>
+          <span className="agy-thinking-badge">
+            {wordCount} {t('messages.wordsCount')}
+          </span>
+          {isStreaming && <span className="agy-live-dot" title="Processando..." />}
         </div>
         <ChevronRight
           size={14}
@@ -182,6 +187,8 @@ const ToolCallItemComponent: React.FC<{
 };
 
 export const App: React.FC = () => {
+  const { t, locale, isAuto, setLocale, supportedLocales } = useI18n();
+
   // Navigation & Layout State
   const [activeView, setActiveView] = useState<MainViewType>('chat');
   const [rightDrawerOpen, setRightDrawerOpen] = useState<boolean>(true);
@@ -1265,7 +1272,7 @@ export const App: React.FC = () => {
 
         <div className="agy-titlebar-center">
           {activeProject && (
-            <span className="agy-project-active-tag">Projeto: {activeProject.name}</span>
+            <span className="agy-project-active-tag">{t('header.projectPrefix')}: {activeProject.name}</span>
           )}
           <span className="agy-workspace-pill">
             <FolderOpen size={12} />
@@ -1273,7 +1280,7 @@ export const App: React.FC = () => {
           </span>
           {activeConversationId && (
             <span className="agy-conv-badge">
-              Sessão: <code>{activeConversationId.slice(0, 8)}</code>
+              {t('header.sessionPrefix')}: <code>{activeConversationId.slice(0, 8)}</code>
             </span>
           )}
         </div>
@@ -1283,7 +1290,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               className="agy-top-action-btn compact"
-              title="Compactar histórico da conversa (/compact)"
+              title={t('header.compactTitle')}
               onClick={handleCompactAction}
               disabled={messages.length === 0}
             >
@@ -1294,7 +1301,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               className="agy-top-action-btn rewind"
-              title="Desfazer o último turno (/rewind)"
+              title={t('header.rewindTitle')}
               onClick={() => handleLocalSlashAction('/rewind')}
               disabled={messages.length === 0}
             >
@@ -1305,7 +1312,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               className="agy-top-action-btn fork"
-              title="Ramificar conversa em uma nova sessão (/fork)"
+              title={t('header.forkTitle')}
               onClick={() => handleLocalSlashAction('/fork')}
               disabled={messages.length === 0}
             >
@@ -1316,7 +1323,7 @@ export const App: React.FC = () => {
             <button
               type="button"
               className="agy-top-action-btn copy"
-              title="Copiar última resposta para a área de transferência (/copy)"
+              title={t('header.copyTitle')}
               onClick={() => handleLocalSlashAction('/copy')}
               disabled={!messages.some((m) => m.role === 'assistant')}
             >
@@ -1325,12 +1332,30 @@ export const App: React.FC = () => {
             </button>
           </div>
 
+          {/* Language Selector */}
+          <div className="agy-lang-selector" title={t('header.language')}>
+            <Globe size={13} className="agy-lang-icon" />
+            <select
+              aria-label={t('header.language')}
+              className="agy-lang-select"
+              value={isAuto ? 'auto' : locale}
+              onChange={(e) => setLocale(e.target.value as any)}
+            >
+              <option value="auto">🌐 Auto ({locale})</option>
+              {supportedLocales.map((l) => (
+                <option key={l.id} value={l.id}>
+                  {l.flag} {l.label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           <span className="agy-msg-meta-pill">{selectedModel}</span>
           <button
             type="button"
             className="agy-icon-btn"
             onClick={() => setRightDrawerOpen(!rightDrawerOpen)}
-            title="Alternar Painel Auxiliar"
+            title={t('header.toggleAuxDrawer')}
           >
             {rightDrawerOpen ? <PanelRightClose size={15} /> : <PanelRightOpen size={15} />}
           </button>
@@ -1351,7 +1376,7 @@ export const App: React.FC = () => {
               onClick={handleNewConversation}
             >
               <MessageSquarePlus size={16} />
-              <span>Nova Conversa</span>
+              <span>{t('sidebar.newConversation')}</span>
             </button>
           </div>
 
@@ -1359,15 +1384,15 @@ export const App: React.FC = () => {
           <div className="agy-sidebar-workspace">
             <div className="agy-projects-header-row">
               <span className="agy-sidebar-section-label" style={{ marginBottom: 0 }}>
-                PROJETO / WORKSPACE
+                {t('sidebar.workspace')}
               </span>
               <button
                 type="button"
                 className="agy-link-btn"
                 onClick={() => setIsProjectModalOpen(true)}
-                title="Criar novo projeto indicando a pasta no disco"
+                title={t('sidebar.newProject')}
               >
-                + Novo Projeto
+                {t('sidebar.newProject')}
               </button>
             </div>
 
@@ -1396,7 +1421,7 @@ export const App: React.FC = () => {
               }}
             >
               {projects.length > 0 && (
-                <optgroup label="Projetos Registrados (~/.gemini/config/projects/)">
+                <optgroup label="~/.gemini/config/projects/">
                   {projects.map((p) => (
                     <option key={p.id} value={p.id}>
                       📁 {p.name} {p.folderPath ? `(${p.folderPath.split(/[\/\\]/).pop()})` : ''}
@@ -1404,7 +1429,7 @@ export const App: React.FC = () => {
                   ))}
                 </optgroup>
               )}
-              <optgroup label="Pastas Confiáveis (trustedWorkspaces)">
+              <optgroup label="trustedWorkspaces">
                 {Array.isArray(settings.trustedWorkspaces) &&
                   settings.trustedWorkspaces.map((ws) => (
                     <option key={ws} value={ws}>
@@ -1421,7 +1446,7 @@ export const App: React.FC = () => {
                   className="agy-link-btn"
                   onClick={handleSelectWorkspaceFolder}
                 >
-                  Abrir outra pasta...
+                  {t('sidebar.openOtherFolder')}
                 </button>
               )}
             </div>
@@ -1429,7 +1454,7 @@ export const App: React.FC = () => {
 
         {/* Navigation: CLI Commands as UI Items */}
         <nav className="agy-sidebar-nav">
-          <div className="agy-sidebar-section-label">COMANDOS & SUPERFÍCIES DO CLI</div>
+          <div className="agy-sidebar-section-label">{t('sidebar.cliCommandsSection')}</div>
 
           <button
             type="button"
@@ -1437,7 +1462,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('chat')}
           >
             <Sparkles size={16} />
-            <span>Chat Canvas</span>
+            <span>{t('sidebar.chatNav')}</span>
             <code className="agy-nav-cmd">agy</code>
           </button>
 
@@ -1447,7 +1472,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('config')}
           >
             <Settings size={16} />
-            <span>Configurações</span>
+            <span>{t('sidebar.configNav')}</span>
             <code className="agy-nav-cmd">/config</code>
           </button>
 
@@ -1457,7 +1482,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('permissions')}
           >
             <Shield size={16} />
-            <span>Permissões</span>
+            <span>{t('sidebar.permissionsNav')}</span>
             <code className="agy-nav-cmd">/permissions</code>
           </button>
 
@@ -1467,7 +1492,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('models')}
           >
             <Cpu size={16} />
-            <span>Modelos & Esforço</span>
+            <span>{t('sidebar.modelsNav')}</span>
             <code className="agy-nav-cmd">models</code>
           </button>
 
@@ -1477,7 +1502,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('mcp')}
           >
             <Server size={16} />
-            <span>Servidores MCP</span>
+            <span>{t('sidebar.mcpNav')}</span>
             <code className="agy-nav-cmd">mcp</code>
           </button>
 
@@ -1487,7 +1512,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('plugins')}
           >
             <Puzzle size={16} />
-            <span>Plugins</span>
+            <span>{t('sidebar.pluginsNav')}</span>
             <code className="agy-nav-cmd">plugin</code>
           </button>
 
@@ -1497,7 +1522,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('skills')}
           >
             <BookOpen size={16} />
-            <span>Skills & Hooks</span>
+            <span>{t('sidebar.skillsNav')}</span>
             <code className="agy-nav-cmd">/skills</code>
           </button>
 
@@ -1507,7 +1532,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('agents')}
           >
             <Bot size={16} />
-            <span>Subagentes</span>
+            <span>{t('sidebar.agentsNav')}</span>
             <code className="agy-nav-cmd">agents</code>
           </button>
 
@@ -1517,7 +1542,7 @@ export const App: React.FC = () => {
             onClick={() => setActiveView('diff')}
           >
             <GitBranch size={16} />
-            <span>Git Diff</span>
+            <span>{t('sidebar.diffNav')}</span>
             <code className="agy-nav-cmd">/diff</code>
           </button>
 
@@ -1535,7 +1560,7 @@ export const App: React.FC = () => {
         {/* Conversations List (/resume) */}
         <div className="agy-sidebar-conversations">
           <div className="agy-sidebar-section-label">
-            <span> SESSÕES (<code>/resume</code>)</span>
+            <span>{t('sidebar.conversationsSection')} (<code>/resume</code>)</span>
             <button
               type="button"
               className="agy-link-btn"
@@ -1831,7 +1856,7 @@ export const App: React.FC = () => {
                 {showSlashPopup && (
                   <div className="agy-floating-palette">
                     <div className="agy-palette-header">
-                      <span>Comandos Slash do Antigravity CLI (<code>/</code>)</span>
+                      <span>{t('prompt.slashPaletteTitle')}</span>
                       <button
                         type="button"
                         className="agy-icon-btn-sm"
@@ -1865,7 +1890,7 @@ export const App: React.FC = () => {
                 {showMentionPopup && (
                   <div className="agy-floating-palette">
                     <div className="agy-palette-header">
-                      <span>Anexar Arquivo do Workspace (<code>@</code>)</span>
+                      <span>{t('prompt.mentionPaletteTitle')}</span>
                       <button
                         type="button"
                         className="agy-icon-btn-sm"
@@ -1883,7 +1908,7 @@ export const App: React.FC = () => {
                           onClick={() => handleSelectMentionFile(f)}
                         >
                           <code>@{f}</code>
-                          <span className="agy-palette-desc">Arquivo do workspace</span>
+                          <span className="agy-palette-desc">{t('prompt.mentionFileDesc')}</span>
                         </button>
                       ))}
                     </div>
@@ -1896,7 +1921,7 @@ export const App: React.FC = () => {
                     className="agy-prompt-textarea"
                     style={{ height: `${composerHeight}px` }}
                     rows={3}
-                    placeholder="Envie uma instrução ao Antigravity CLI... (Digite /config para todas as opções, / para comandos, @ para arquivos)"
+                    placeholder={t('prompt.placeholder')}
                     value={promptInput}
                     onChange={(e) => handlePromptChange(e.target.value)}
                     onKeyDown={handleCycleModeKey}
@@ -1920,7 +1945,7 @@ export const App: React.FC = () => {
                       <button
                         type="button"
                         className="agy-footer-icon-btn"
-                        title="Mencionar arquivo do workspace (@)"
+                        title={t('prompt.mentionPaletteTitle')}
                         onClick={() => {
                           setShowMentionPopup(!showMentionPopup);
                           setMentionFilter('');
@@ -1933,7 +1958,7 @@ export const App: React.FC = () => {
                       <div className="agy-control-group" title="Escolher o modelo do Antigravity CLI (--model)">
                         <Cpu size={14} className="agy-accent-icon" />
                         <select
-                          aria-label="Selecionar Modelo"
+                          aria-label={t('prompt.selectModel')}
                           className="agy-footer-select model-combo"
                           value={selectedModel}
                           onChange={(e) => {
@@ -1963,7 +1988,7 @@ export const App: React.FC = () => {
                             ? 'is-ask'
                             : 'is-sandbox'
                         }`}
-                        title="Indicar se o usuário deve dar permissão para execução de comandos ou se será automático"
+                        title={t('prompt.commandPermissionTitle')}
                       >
                         {permissionPolicy === 'always-proceed' ? (
                           <Unlock size={14} />
@@ -1973,7 +1998,7 @@ export const App: React.FC = () => {
                           <Lock size={14} />
                         )}
                         <select
-                          aria-label="Política de Permissão de Execução de Comandos"
+                          aria-label={t('prompt.commandPermissionTitle')}
                           className="agy-footer-select"
                           value={permissionPolicy}
                           onChange={(e) => {
@@ -1983,24 +2008,24 @@ export const App: React.FC = () => {
                           }}
                         >
                           <option value="always-proceed">
-                            ⚡ Comandos: Automático (Sem pedir permissão)
+                            {t('prompt.commandsAuto')}
                           </option>
                           <option value="request-review">
-                            ✋ Comandos: Pedir Permissão ao Usuário
+                            {t('prompt.commandsAsk')}
                           </option>
                           <option value="proceed-in-sandbox">
-                            🔒 Comandos: Automático em Sandbox
+                            {t('prompt.commandsSandbox')}
                           </option>
                           <option value="strict">
-                            🛡️ Comandos: Modo Estrito (Sempre pedir)
+                            {t('prompt.commandsStrict')}
                           </option>
                         </select>
                       </div>
 
                       {/* 4. COMBO DE MODO DO AGENTE (--mode) */}
-                      <div className="agy-control-group" title="Modo de execução da sessão (--mode / Shift+Tab)">
+                      <div className="agy-control-group" title={t('prompt.modeTitle')}>
                         <select
-                          aria-label="Modo de Execução"
+                          aria-label={t('prompt.modeTitle')}
                           className="agy-footer-select"
                           value={selectedMode}
                           onChange={(e) => {
@@ -2008,10 +2033,10 @@ export const App: React.FC = () => {
                             handleSaveSettings({ agentMode: e.target.value });
                           }}
                         >
-                          <option value="default">Modo: Padrão</option>
-                          <option value="auto">Modo: Auto</option>
-                          <option value="accept-edits">Modo: Accept Edits</option>
-                          <option value="plan">Modo: Plan</option>
+                          <option value="default">{t('prompt.modeDefault')}</option>
+                          <option value="auto">{t('prompt.modeAuto')}</option>
+                          <option value="accept-edits">{t('prompt.modeAcceptEdits')}</option>
+                          <option value="plan">{t('prompt.modePlan')}</option>
                         </select>
                       </div>
                     </div>
@@ -2023,7 +2048,7 @@ export const App: React.FC = () => {
                           className="agy-send-btn stop"
                           onClick={handleStopStream}
                         >
-                          <Square size={14} /> Parar
+                          <Square size={14} /> {t('common.stop')}
                         </button>
                       ) : (
                         <button
@@ -2032,7 +2057,7 @@ export const App: React.FC = () => {
                           onClick={() => handleSendPrompt()}
                           disabled={!promptInput.trim()}
                         >
-                          <Send size={14} /> Enviar
+                          <Send size={14} /> {t('common.send')}
                         </button>
                       )}
                     </div>
@@ -2065,21 +2090,21 @@ export const App: React.FC = () => {
               className={`agy-aux-tab ${rightDrawerTab === 'terminal' ? 'active' : ''}`}
               onClick={() => setRightDrawerTab('terminal')}
             >
-              <Terminal size={14} /> CLI & Terminal
+              <Terminal size={14} /> {t('terminal.tabTitle')}
             </button>
             <button
               type="button"
               className={`agy-aux-tab ${rightDrawerTab === 'artifacts' ? 'active' : ''}`}
               onClick={() => setRightDrawerTab('artifacts')}
             >
-              <FileText size={14} /> Artefatos ({artifacts.length})
+              <FileText size={14} /> {t('terminal.artifactsTab')} ({artifacts.length})
             </button>
             <button
               type="button"
               className={`agy-aux-tab ${rightDrawerTab === 'history' ? 'active' : ''}`}
               onClick={() => setRightDrawerTab('history')}
             >
-              <History size={14} /> Histórico
+              <History size={14} /> {t('terminal.historyTab')}
             </button>
           </div>
 
@@ -2104,17 +2129,17 @@ export const App: React.FC = () => {
                     type="button"
                     className="agy-terminal-scroll-down-btn"
                     onClick={handleScrollToTerminalBottom}
-                    title="Rolar para o final do terminal"
+                    title={t('terminal.scrollToBottom')}
                   >
                     <ArrowDown size={12} />
-                    <span>Rolar para o final</span>
+                    <span>{t('terminal.scrollToBottom')}</span>
                   </button>
                 )}
 
                 <div className="agy-aux-terminal-input">
                   <input
                     type="text"
-                    placeholder="Executar comando CLI (ex: agy models)..."
+                    placeholder={t('terminal.inputPlaceholder')}
                     value={directCliInput}
                     onChange={(e) => setDirectCliInput(e.target.value)}
                     onKeyDown={(e) => e.key === 'Enter' && handleRunDirectTerminalCmd()}
@@ -2134,7 +2159,7 @@ export const App: React.FC = () => {
               <div className="agy-aux-list">
                 {artifacts.length === 0 ? (
                   <p className="agy-muted-text" style={{ padding: 16 }}>
-                    Nenhum artefato gerado nesta conversa ainda.
+                    {t('terminal.noArtifacts')}
                   </p>
                 ) : (
                   artifacts.map((art) => (
@@ -2152,20 +2177,26 @@ export const App: React.FC = () => {
 
             {rightDrawerTab === 'history' && (
               <div className="agy-aux-list">
-                {cliHistory.map((h, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    className="agy-history-item"
-                    onClick={() => {
-                      setPromptInput(h.display || '');
-                      setActiveView('chat');
-                    }}
-                  >
-                    <code>{h.display}</code>
-                    <span>{h.workspace ? h.workspace.split('/').pop() : 'CLI'}</span>
-                  </button>
-                ))}
+                {cliHistory.length === 0 ? (
+                  <p className="agy-muted-text" style={{ padding: 16 }}>
+                    {t('terminal.noHistory')}
+                  </p>
+                ) : (
+                  cliHistory.map((h, i) => (
+                    <button
+                      key={i}
+                      type="button"
+                      className="agy-history-item"
+                      onClick={() => {
+                        setPromptInput(h.display || '');
+                        setActiveView('chat');
+                      }}
+                    >
+                      <code>{h.display}</code>
+                      <span>{h.workspace ? h.workspace.split('/').pop() : 'CLI'}</span>
+                    </button>
+                  ))
+                )}
               </div>
             )}
           </div>
