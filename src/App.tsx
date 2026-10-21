@@ -65,6 +65,120 @@ type MainViewType =
   | 'diff'
   | 'system';
 
+const ThinkingBox: React.FC<{ thinking: string; isStreaming?: boolean }> = ({
+  thinking,
+  isStreaming,
+}) => {
+  const [open, setOpen] = useState(false);
+  const wordCount = Math.max(1, Math.round(thinking.trim().split(/\s+/).length));
+
+  return (
+    <div className={`agy-thinking-box ${open ? 'open' : ''}`}>
+      <button
+        type="button"
+        className="agy-thinking-header"
+        onClick={() => setOpen(!open)}
+        title={open ? 'Ocultar raciocínio' : 'Expandir raciocínio'}
+      >
+        <div className="agy-thinking-title">
+          <Sparkles size={13} className="agy-accent-icon" />
+          <span>Raciocínio do Modelo (Thinking)</span>
+          <span className="agy-thinking-badge">{wordCount} palavras</span>
+          {isStreaming && <span className="agy-live-dot" title="Processando raciocínio..." />}
+        </div>
+        <ChevronRight
+          size={14}
+          className="agy-chevron-toggle"
+          style={{
+            transform: open ? 'rotate(90deg)' : 'none',
+            transition: 'transform 150ms ease',
+          }}
+        />
+      </button>
+
+      {open && (
+        <div className="agy-thinking-body">
+          <pre>{thinking}</pre>
+        </div>
+      )}
+    </div>
+  );
+};
+
+const ToolCallItemComponent: React.FC<{
+  tc: {
+    name: string;
+    args: Record<string, any>;
+    status?: 'running' | 'done' | 'approved' | 'rejected';
+    output?: string;
+  };
+}> = ({ tc }) => {
+  const [open, setOpen] = useState(false);
+
+  let summary = '';
+  if (tc.name === 'run_command' && tc.args?.CommandLine) {
+    summary = String(tc.args.CommandLine).replace(/^["']|["']$/g, '');
+  } else if (tc.args?.Path) {
+    summary = String(tc.args.Path).replace(/^["']|["']$/g, '');
+  } else if (tc.args?.query) {
+    summary = String(tc.args.query);
+  } else if (tc.args?.toolSummary) {
+    summary = String(tc.args.toolSummary).replace(/^["']|["']$/g, '');
+  } else if (tc.args && typeof tc.args === 'object') {
+    summary = Object.keys(tc.args)
+      .slice(0, 2)
+      .map((k) => `${k}: ${String(tc.args[k]).slice(0, 30)}`)
+      .join(', ');
+  }
+
+  return (
+    <div className={`agy-toolcall-item-wrap ${open ? 'open' : ''}`}>
+      <button
+        type="button"
+        className="agy-toolcall-item"
+        onClick={() => setOpen(!open)}
+        title={open ? 'Recolher detalhes da ferramenta' : 'Expandir detalhes da ferramenta'}
+      >
+        <div className="agy-toolcall-header-left">
+          <Terminal size={12} className="agy-accent-icon" />
+          <code className="agy-tool-name">{tc.name}</code>
+          {summary && <span className="agy-toolcall-args">{summary}</span>}
+        </div>
+        <div className="agy-toolcall-header-right">
+          {tc.status === 'running' ? (
+            <span className="agy-tool-status running">executando...</span>
+          ) : (
+            <span className="agy-tool-status done">concluído</span>
+          )}
+          <ChevronRight
+            size={12}
+            className="agy-chevron-toggle"
+            style={{
+              transform: open ? 'rotate(90deg)' : 'none',
+              transition: 'transform 150ms ease',
+            }}
+          />
+        </div>
+      </button>
+
+      {open && (
+        <div className="agy-toolcall-detail-pane">
+          <div className="agy-toolcall-section">
+            <span className="agy-toolcall-section-title">Parâmetros:</span>
+            <pre className="agy-code-block">{JSON.stringify(tc.args, null, 2)}</pre>
+          </div>
+          {tc.output && (
+            <div className="agy-toolcall-section">
+              <span className="agy-toolcall-section-title">Saída / Retorno:</span>
+              <pre className="agy-tool-output">{tc.output}</pre>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
+
 export const App: React.FC = () => {
   // Navigation & Layout State
   const [activeView, setActiveView] = useState<MainViewType>('chat');
@@ -339,8 +453,11 @@ export const App: React.FC = () => {
       setArtifacts(detail.artifacts || []);
 
       const loadedMessages: ChatMessageItem[] = [];
+      let currentAssistantMsg: ChatMessageItem | null = null;
+
       for (const step of detail.steps || []) {
         if (step.type === 'USER_INPUT') {
+          currentAssistantMsg = null;
           loadedMessages.push({
             id: `step-${step.step_index}`,
             role: 'user',
@@ -349,29 +466,64 @@ export const App: React.FC = () => {
             status: 'done',
           });
         } else if (step.type === 'PLANNER_RESPONSE') {
-          const toolCalls = Array.isArray(step.tool_calls)
+          const rawToolCalls = Array.isArray(step.tool_calls)
             ? step.tool_calls.map((tc: any) => ({
                 name: tc.name || 'tool',
                 args: tc.args || {},
                 status: 'done' as const,
               }))
-            : undefined;
-          if (step.content || step.thinking || (toolCalls && toolCalls.length > 0)) {
-            loadedMessages.push({
+            : [];
+
+          if (!currentAssistantMsg) {
+            currentAssistantMsg = {
               id: `step-${step.step_index}`,
               role: 'assistant',
               content: step.content || '',
               thinking: step.thinking || undefined,
-              toolCalls,
+              toolCalls: rawToolCalls.length > 0 ? rawToolCalls : undefined,
               timestamp: step.created_at || new Date().toISOString(),
               status: 'done',
-            });
+            };
+            loadedMessages.push(currentAssistantMsg);
+          } else {
+            // Merge intermediate steps into the single assistant turn
+            if (step.content) {
+              currentAssistantMsg.content = currentAssistantMsg.content
+                ? `${currentAssistantMsg.content}\n\n${step.content}`
+                : step.content;
+            }
+            if (step.thinking) {
+              currentAssistantMsg.thinking = currentAssistantMsg.thinking
+                ? `${currentAssistantMsg.thinking}\n${step.thinking}`
+                : step.thinking;
+            }
+            if (rawToolCalls.length > 0) {
+              currentAssistantMsg.toolCalls = [
+                ...(currentAssistantMsg.toolCalls || []),
+                ...rawToolCalls,
+              ];
+            }
+          }
+        } else if (step.type === 'GENERIC' || step.type === 'TOOL_RESULT') {
+          if (
+            currentAssistantMsg &&
+            currentAssistantMsg.toolCalls &&
+            currentAssistantMsg.toolCalls.length > 0
+          ) {
+            const lastTool =
+              currentAssistantMsg.toolCalls[currentAssistantMsg.toolCalls.length - 1];
+            if (!lastTool.output && step.content) {
+              lastTool.output =
+                typeof step.content === 'string'
+                  ? step.content
+                  : JSON.stringify(step.content, null, 2);
+            }
           }
         }
       }
 
       setMessages(loadedMessages);
-      appendLog('info', `Conversa ${convId.slice(0, 8)} carregada (${loadedMessages.length} mensagens).`);
+      appendLog('info', `Conversa ${convId.slice(0, 8)} carregada (${loadedMessages.length} turnos).`);
     } catch (err: any) {
       appendLog('stderr', `Erro ao carregar conversa: ${err.message}`);
     }
@@ -1471,25 +1623,17 @@ export const App: React.FC = () => {
 
                           {/* Collapsible Thinking / Reasoning */}
                           {msg.thinking && (
-                            <details className="agy-thinking-box">
-                              <summary>
-                                <ChevronRight size={14} /> Raciocínio do Modelo (Thinking)
-                              </summary>
-                              <pre>{msg.thinking}</pre>
-                            </details>
+                            <ThinkingBox
+                              thinking={msg.thinking}
+                              isStreaming={msg.status === 'streaming'}
+                            />
                           )}
 
                           {/* Tool Calls */}
                           {msg.toolCalls && msg.toolCalls.length > 0 && (
                             <div className="agy-toolcalls-stack">
                               {msg.toolCalls.map((tc, idx) => (
-                                <div key={idx} className="agy-toolcall-item">
-                                  <Terminal size={13} className="agy-accent-icon" />
-                                  <code>{tc.name}</code>
-                                  <span className="agy-toolcall-args">
-                                    {JSON.stringify(tc.args).slice(0, 120)}
-                                  </span>
-                                </div>
+                                <ToolCallItemComponent key={idx} tc={tc} />
                               ))}
                             </div>
                           )}
