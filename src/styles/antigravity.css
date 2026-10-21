@@ -1872,6 +1872,36 @@ pre {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  position: relative;
+}
+
+.agy-terminal-scroll-down-btn {
+  position: absolute;
+  bottom: 50px;
+  right: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #1E293B;
+  border: 1px solid #334155;
+  color: #93C5FD;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  z-index: 10;
+  transition: all 140ms ease;
+  user-select: none;
+  animation: agy-fade-in 150ms ease;
+}
+
+.agy-terminal-scroll-down-btn:hover {
+  background: #2563EB;
+  color: #ffffff;
+  border-color: #3B82F6;
+  transform: translateY(-1px);
 }
 
 .agy-aux-terminal-logs {

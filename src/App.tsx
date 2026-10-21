@@ -37,6 +37,7 @@ import {
   X,
   FolderPlus,
   Minimize2,
+  ArrowDown,
 } from 'lucide-react';
 import { AntigravityLogo } from './components/AntigravityLogo';
 import { ConfigView } from './components/ConfigView';
@@ -232,6 +233,9 @@ export const App: React.FC = () => {
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+  const terminalLogsRef = useRef<HTMLDivElement | null>(null);
+  const isTerminalAtBottomRef = useRef<boolean>(true);
+  const [isTerminalScrolledUp, setIsTerminalScrolledUp] = useState<boolean>(false);
 
   // Resizable Panes State (Sidebar width, Right Drawer width, Composer height)
   const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
@@ -329,6 +333,35 @@ export const App: React.FC = () => {
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isStreaming]);
+
+  // Terminal logs smart auto-scroll
+  const handleTerminalScroll = () => {
+    const el = terminalLogsRef.current;
+    if (!el) return;
+    const threshold = 35; // margin of 35px from bottom
+    const atBottom = el.scrollHeight - el.scrollTop - el.clientHeight <= threshold;
+    isTerminalAtBottomRef.current = atBottom;
+    setIsTerminalScrolledUp(!atBottom);
+  };
+
+  const handleScrollToTerminalBottom = () => {
+    const el = terminalLogsRef.current;
+    if (el) {
+      el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' });
+      isTerminalAtBottomRef.current = true;
+      setIsTerminalScrolledUp(false);
+    }
+  };
+
+  useEffect(() => {
+    if (rightDrawerTab !== 'terminal') return;
+    const el = terminalLogsRef.current;
+    if (!el) return;
+
+    if (isTerminalAtBottomRef.current) {
+      el.scrollTop = el.scrollHeight;
+    }
+  }, [terminalLogs, rightDrawerTab]);
 
   const appendLog = (type: 'cmd' | 'stdout' | 'stderr' | 'info', text: string) => {
     setTerminalLogs((prev) => [
@@ -2050,7 +2083,11 @@ export const App: React.FC = () => {
           <div className="agy-aux-body">
             {rightDrawerTab === 'terminal' && (
               <div className="agy-aux-terminal">
-                <div className="agy-aux-terminal-logs">
+                <div
+                  ref={terminalLogsRef}
+                  className="agy-aux-terminal-logs"
+                  onScroll={handleTerminalScroll}
+                >
                   {terminalLogs.map((l) => (
                     <div key={l.id} className={`agy-term-line ${l.type}`}>
                       <span className="agy-term-time">{l.time}</span>
@@ -2058,6 +2095,19 @@ export const App: React.FC = () => {
                     </div>
                   ))}
                 </div>
+
+                {isTerminalScrolledUp && (
+                  <button
+                    type="button"
+                    className="agy-terminal-scroll-down-btn"
+                    onClick={handleScrollToTerminalBottom}
+                    title="Rolar para o final do terminal"
+                  >
+                    <ArrowDown size={12} />
+                    <span>Rolar para o final</span>
+                  </button>
+                )}
+
                 <div className="agy-aux-terminal-input">
                   <input
                     type="text"
