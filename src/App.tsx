@@ -39,6 +39,7 @@ import {
   Minimize2,
   ArrowDown,
   Globe,
+  ExternalLink,
 } from 'lucide-react';
 import { AntigravityLogo } from './components/AntigravityLogo';
 import { ConfigView } from './components/ConfigView';
@@ -1651,6 +1652,32 @@ export const App: React.FC = () => {
           ) : (
             /* CHAT CANVAS */
             <div className="agy-chat-canvas">
+              {systemStatus && systemStatus.agyInstalled === false && (
+                <div className="agy-missing-banner">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <AlertTriangle size={20} style={{ flexShrink: 0 }} />
+                    <div className="agy-missing-content">
+                      <strong>Comando <code>agy</code> não encontrado no sistema</strong>
+                      <span>
+                        O Antigravity CLI Studio é a interface visual para o Google Antigravity CLI.
+                        Certifique-se de que o comando <code>agy</code> está instalado no PATH do seu sistema.
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    className="agy-btn agy-btn-secondary"
+                    onClick={() => {
+                      if (window.electronAPI?.openExternal) {
+                        window.electronAPI.openExternal('https://github.com/google-deepmind/antigravity');
+                      }
+                    }}
+                  >
+                    <ExternalLink size={13} /> Documentação do agy
+                  </button>
+                </div>
+              )}
+
               <div className="agy-messages-scroll">
                 {messages.length === 0 ? (
                   <div className="agy-empty-hero">

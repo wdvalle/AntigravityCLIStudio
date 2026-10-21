@@ -367,6 +367,25 @@ export class AgyService {
     return binName;
   }
 
+  public async checkAgyInstalled(): Promise<{ installed: boolean; binaryPath: string; version?: string }> {
+    const bin = this.resolveAgyBinary();
+    try {
+      const res = await this.execAgy(['--version'], undefined, 5000);
+      const output = (res.stdout || '').trim();
+      const installed = res.code === 0 && Boolean(output);
+      return {
+        installed,
+        binaryPath: bin,
+        version: output || undefined,
+      };
+    } catch {
+      return {
+        installed: false,
+        binaryPath: bin,
+      };
+    }
+  }
+
   public readSettings(): AgySettings {
     const settingsPath = this.getSettingsPath();
     let fileSettings: Partial<AgySettings> = {};

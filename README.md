@@ -21,6 +21,24 @@
 
 ---
 
+## 📥 Download & Install (No Node.js or npm Required!)
+
+The release packages are **100% standalone** executables. You do **not** need Node.js or npm installed on your computer to run the app—simply download, install, and run:
+
+| Operating System | Package | Link |
+| :--- | :--- | :--- |
+| 🍏 **macOS** (Apple Silicon) | Installer Disk Image (`.dmg`) | [**Download .dmg**](https://github.com/wdvalle/AntigravityCLIStudio/releases/download/v2.0.0/Antigravity.CLI.Studio-2.0.0-arm64.dmg) |
+| 🍏 **macOS** (Apple Silicon) | Standalone Application (`.zip`) | [**Download .zip**](https://github.com/wdvalle/AntigravityCLIStudio/releases/download/v2.0.0/Antigravity.CLI.Studio-2.0.0-arm64-mac.zip) |
+| 🪟 **Windows** | Setup Wizard Installer (`.exe`) | [**Download Setup .exe**](https://github.com/wdvalle/AntigravityCLIStudio/releases/download/v2.0.0/Antigravity.CLI.Studio.Setup.2.0.0.exe) |
+| 🪟 **Windows** | Portable Executable (No install) | [**Download Portable .exe**](https://github.com/wdvalle/AntigravityCLIStudio/releases/download/v2.0.0/Antigravity.CLI.Studio.2.0.0.exe) |
+| 🐧 **Linux** | Universal AppImage (`.AppImage`) | [**Download .AppImage**](https://github.com/wdvalle/AntigravityCLIStudio/releases/download/v2.0.0/Antigravity.CLI.Studio-2.0.0.AppImage) |
+| 🐧 **Linux** | Debian / Ubuntu Package (`.deb`) | [**Download .deb**](https://github.com/wdvalle/AntigravityCLIStudio/releases/download/v2.0.0/antigravity-cli-gui_2.0.0_amd64.deb) |
+| 🐧 **Linux** | Compressed Binary Archive (`.tar.gz`) | [**Download .tar.gz**](https://github.com/wdvalle/AntigravityCLIStudio/releases/download/v2.0.0/antigravity-cli-gui-2.0.0.tar.gz) |
+
+> **Requirement for End Users**: The only tool you need is the official Google Antigravity CLI binary (`agy`) in your system PATH, which this studio interfaces with.
+
+---
+
 ## 📌 Overview
 
 **Antigravity CLI Studio** is a cross-platform desktop application (macOS, Linux, and Windows) built to provide a modern, intuitive, and feature-rich graphical experience for the **Google Antigravity CLI (`agy`)**.
@@ -114,9 +132,12 @@ AntigravityGUI/
 
 ## 🚀 Getting Started
 
-### Prerequisites
-- **Node.js** (v18.0.0 or higher)
-- **npm** or **yarn**
+### Prerequisites (For Developers / Building from Source Only)
+
+> If you just want to run the application, download the precompiled binary from the [Download & Install](#-download--install-no-nodejs-or-npm-required) section above instead.
+
+- **Node.js** (v18.0.0 or higher) — *Only needed for building from source*
+- **npm** or **yarn** — *Only needed for building from source*
 - **Google Antigravity CLI (`agy`)** installed and available in your system `PATH`
 
 ### 1. Clone and Install Dependencies

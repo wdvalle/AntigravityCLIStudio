@@ -42,6 +42,8 @@ export const agyApi = {
       platform: string;
       arch: string;
       agyBinary: string;
+      agyInstalled?: boolean;
+      agyVersion?: string;
       settingsPath: string;
       dataDir: string;
       cwd: string;

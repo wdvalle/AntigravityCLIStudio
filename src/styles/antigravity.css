@@ -2404,3 +2404,36 @@ pre {
   margin-bottom: 12px;
   font-size: 12.5px;
 }
+
+/* Missing agy CLI banner */
+.agy-missing-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin: 12px 18px 0;
+  padding: 12px 16px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius-sm);
+  color: #fbbf24;
+}
+
+.agy-missing-content {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 12.5px;
+}
+
+.agy-missing-content strong {
+  color: #fef3c7;
+  font-size: 13px;
+}
+
+.agy-missing-content code {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+}

@@ -9,13 +9,15 @@ export function createApp() {
 
   // System & Binary Info
   app.get('/api/status', async (_req, res) => {
-    const bin = agyService.resolveAgyBinary();
+    const check = await agyService.checkAgyInstalled();
     const settings = agyService.readSettings();
     res.json({
       ok: true,
       platform: process.platform,
       arch: process.arch,
-      agyBinary: bin,
+      agyBinary: check.binaryPath,
+      agyInstalled: check.installed,
+      agyVersion: check.version,
       settingsPath: agyService.getSettingsPath(),
       dataDir: agyService.getAgyDataDir(),
       cwd: process.cwd(),
