@@ -116,6 +116,95 @@ export const App: React.FC = () => {
   const chatEndRef = useRef<HTMLDivElement | null>(null);
   const promptTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 
+  // Resizable Panes State (Sidebar width, Right Drawer width, Composer height)
+  const [sidebarWidth, setSidebarWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('agy_sidebar_width');
+      return saved ? Math.max(180, Math.min(520, parseInt(saved, 10))) : 268;
+    } catch {
+      return 268;
+    }
+  });
+  const [rightDrawerWidth, setRightDrawerWidth] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('agy_right_drawer_width');
+      return saved ? Math.max(220, Math.min(750, parseInt(saved, 10))) : 340;
+    } catch {
+      return 340;
+    }
+  });
+  const [composerHeight, setComposerHeight] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('agy_composer_height');
+      return saved ? Math.max(56, Math.min(380, parseInt(saved, 10))) : 80;
+    } catch {
+      return 80;
+    }
+  });
+
+  const [isResizingLeft, setIsResizingLeft] = useState(false);
+  const [isResizingRight, setIsResizingRight] = useState(false);
+  const [isResizingComposer, setIsResizingComposer] = useState(false);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isResizingLeft) {
+        const newWidth = Math.max(180, Math.min(520, e.clientX));
+        setSidebarWidth(newWidth);
+        localStorage.setItem('agy_sidebar_width', String(newWidth));
+      } else if (isResizingRight) {
+        const newWidth = Math.max(220, Math.min(750, window.innerWidth - e.clientX));
+        setRightDrawerWidth(newWidth);
+        localStorage.setItem('agy_right_drawer_width', String(newWidth));
+      } else if (isResizingComposer) {
+        const newHeight = Math.max(56, Math.min(380, window.innerHeight - e.clientY - 60));
+        setComposerHeight(newHeight);
+        localStorage.setItem('agy_composer_height', String(newHeight));
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isResizingLeft || isResizingRight || isResizingComposer) {
+        setIsResizingLeft(false);
+        setIsResizingRight(false);
+        setIsResizingComposer(false);
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+      }
+    };
+
+    if (isResizingLeft || isResizingRight || isResizingComposer) {
+      document.body.style.userSelect = 'none';
+      if (isResizingLeft || isResizingRight) {
+        document.body.style.cursor = 'col-resize';
+      } else if (isResizingComposer) {
+        document.body.style.cursor = 'row-resize';
+      }
+      window.addEventListener('mousemove', handleMouseMove);
+      window.addEventListener('mouseup', handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingLeft, isResizingRight, isResizingComposer]);
+
+  const handleResetSidebarWidth = () => {
+    setSidebarWidth(268);
+    localStorage.setItem('agy_sidebar_width', '268');
+  };
+
+  const handleResetRightDrawerWidth = () => {
+    setRightDrawerWidth(340);
+    localStorage.setItem('agy_right_drawer_width', '340');
+  };
+
+  const handleResetComposerHeight = () => {
+    setComposerHeight(80);
+    localStorage.setItem('agy_composer_height', '80');
+  };
+
   useEffect(() => {
     initializeApp();
   }, []);
@@ -991,7 +1080,10 @@ export const App: React.FC = () => {
 
       <div className="agy-app-body">
         {/* LEFT-HAND SIDEBAR (Antigravity 2.0 Surface) */}
-        <aside className="agy-sidebar">
+        <aside
+          className="agy-sidebar"
+          style={{ width: `${sidebarWidth}px`, minWidth: `${sidebarWidth}px` }}
+        >
           {/* New Conversation Button */}
           <div className="agy-sidebar-cta" style={{ paddingTop: 14 }}>
             <button
@@ -1225,6 +1317,14 @@ export const App: React.FC = () => {
           </div>
         </div>
       </aside>
+
+      {/* RESIZER: Left Sidebar */}
+      <div
+        className={`agy-resizer-vertical left ${isResizingLeft ? 'active' : ''}`}
+        onMouseDown={() => setIsResizingLeft(true)}
+        onDoubleClick={handleResetSidebarWidth}
+        title="Arrastar para redimensionar barra lateral (duplo clique para restaurar 268px)"
+      />
 
       {/* CENTER MAIN WORKSPACE */}
       <main className="agy-main-area">
@@ -1464,6 +1564,14 @@ export const App: React.FC = () => {
                 )}
               </div>
 
+              {/* RESIZER: Composer / Prompt Box Height */}
+              <div
+                className={`agy-resizer-horizontal ${isResizingComposer ? 'active' : ''}`}
+                onMouseDown={() => setIsResizingComposer(true)}
+                onDoubleClick={handleResetComposerHeight}
+                title="Arrastar para redimensionar área de prompt (duplo clique para restaurar)"
+              />
+
               {/* PROMPT COMPOSER + BELOW-PROMPT MODEL & PERMISSION BAR */}
               <div className="agy-composer-Dock">
                 {/* / Slash Command Palette Popup */}
@@ -1533,6 +1641,7 @@ export const App: React.FC = () => {
                   <textarea
                     ref={promptTextareaRef}
                     className="agy-prompt-textarea"
+                    style={{ height: `${composerHeight}px` }}
                     rows={3}
                     placeholder="Envie uma instrução ao Antigravity CLI... (Digite /config para todas as opções, / para comandos, @ para arquivos)"
                     value={promptInput}
@@ -1684,7 +1793,19 @@ export const App: React.FC = () => {
 
       {/* RIGHT AUXILIARY PANE (Antigravity 2.0 Auxiliary Pane) */}
       {rightDrawerOpen && (
-        <aside className="agy-aux-drawer">
+        <>
+          {/* RESIZER: Right Drawer */}
+          <div
+            className={`agy-resizer-vertical right ${isResizingRight ? 'active' : ''}`}
+            onMouseDown={() => setIsResizingRight(true)}
+            onDoubleClick={handleResetRightDrawerWidth}
+            title="Arrastar para redimensionar painel auxiliar (duplo clique para restaurar 340px)"
+          />
+
+          <aside
+            className="agy-aux-drawer"
+            style={{ width: `${rightDrawerWidth}px`, minWidth: `${rightDrawerWidth}px` }}
+          >
           <div className="agy-aux-tabs">
             <button
               type="button"
@@ -1779,6 +1900,7 @@ export const App: React.FC = () => {
             )}
           </div>
         </aside>
+        </>
       )}
       </div>
 
