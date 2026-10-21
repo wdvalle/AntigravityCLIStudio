@@ -1,6 +1,6 @@
 {
   "name": "antigravity-cli-gui",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Complete Cross-Platform Desktop GUI for Google Antigravity CLI (agy) with Antigravity 2.0 Visual Style",
   "main": "dist-electron/electron/main.js",
   "author": {
