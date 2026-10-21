@@ -225,6 +225,9 @@ export const App: React.FC = () => {
     { id: string; time: string; type: 'cmd' | 'stdout' | 'stderr' | 'info'; text: string }[]
   >([]);
   const [cliHistory, setCliHistory] = useState<any[]>([]);
+  const [promptHistory, setPromptHistory] = useState<string[]>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+  const [savedPromptDraft, setSavedPromptDraft] = useState<string>('');
   const [directCliInput, setDirectCliInput] = useState<string>('');
 
   const chatEndRef = useRef<HTMLDivElement | null>(null);
@@ -409,6 +412,10 @@ export const App: React.FC = () => {
 
       setConversations(convsRes.conversations || []);
       setCliHistory(histRes.history || []);
+      const histPrompts = (histRes.history || [])
+        .map((h: any) => h.display || h.prompt)
+        .filter(Boolean);
+      setPromptHistory(histPrompts);
 
       appendLog(
         'info',
@@ -554,6 +561,9 @@ export const App: React.FC = () => {
 
   const handlePromptChange = (val: string) => {
     setPromptInput(val);
+    if (historyIndex !== -1 && val !== promptHistory[historyIndex]) {
+      setHistoryIndex(-1);
+    }
 
     // Check for / slash command trigger at start of input
     if (val.startsWith('/')) {
@@ -669,6 +679,11 @@ export const App: React.FC = () => {
     if (overrideText === undefined) {
       setPromptInput('');
     }
+
+    // Save to prompt history & reset navigation index
+    setPromptHistory((prev) => [text, ...prev.filter((p) => p !== text)]);
+    setHistoryIndex(-1);
+    setSavedPromptDraft('');
 
     // Intercept /config or /settings to open the full 36-option /config screen directly!
     if (text === '/config' || text === '/settings') {
@@ -1101,6 +1116,64 @@ export const App: React.FC = () => {
       handleSaveSettings({ agentMode: nextMode });
       return;
     }
+
+    // Arrow Up: navigate backwards in prompt history (older prompts)
+    if (e.key === 'ArrowUp' && !showSlashPopup && !showMentionPopup) {
+      const textarea = promptTextareaRef.current;
+      const cursorPos = textarea?.selectionStart ?? 0;
+      const isAtFirstLine = !promptInput || promptInput.slice(0, cursorPos).indexOf('\n') === -1;
+
+      if (isAtFirstLine && promptHistory.length > 0) {
+        e.preventDefault();
+        if (historyIndex === -1) {
+          setSavedPromptDraft(promptInput);
+        }
+        const nextIdx = Math.min(promptHistory.length - 1, historyIndex + 1);
+        if (nextIdx >= 0 && nextIdx < promptHistory.length) {
+          setHistoryIndex(nextIdx);
+          const historyText = promptHistory[nextIdx];
+          setPromptInput(historyText);
+          setTimeout(() => {
+            if (promptTextareaRef.current) {
+              promptTextareaRef.current.selectionStart = promptTextareaRef.current.selectionEnd = historyText.length;
+            }
+          }, 0);
+        }
+        return;
+      }
+    }
+
+    // Arrow Down: navigate forwards in prompt history (newer prompts)
+    if (e.key === 'ArrowDown' && !showSlashPopup && !showMentionPopup) {
+      const textarea = promptTextareaRef.current;
+      const cursorPos = textarea?.selectionEnd ?? 0;
+      const isAtLastLine = !promptInput || promptInput.slice(cursorPos).indexOf('\n') === -1;
+
+      if (isAtLastLine && historyIndex !== -1) {
+        e.preventDefault();
+        const nextIdx = historyIndex - 1;
+        if (nextIdx >= 0) {
+          setHistoryIndex(nextIdx);
+          const historyText = promptHistory[nextIdx];
+          setPromptInput(historyText);
+          setTimeout(() => {
+            if (promptTextareaRef.current) {
+              promptTextareaRef.current.selectionStart = promptTextareaRef.current.selectionEnd = historyText.length;
+            }
+          }, 0);
+        } else {
+          setHistoryIndex(-1);
+          setPromptInput(savedPromptDraft);
+          setTimeout(() => {
+            if (promptTextareaRef.current) {
+              promptTextareaRef.current.selectionStart = promptTextareaRef.current.selectionEnd = savedPromptDraft.length;
+            }
+          }, 0);
+        }
+        return;
+      }
+    }
+
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       if (showSlashPopup) {
