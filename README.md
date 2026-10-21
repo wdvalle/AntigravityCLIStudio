@@ -158,6 +158,12 @@ npm run dist:win
 
 # Build packages for all target platforms
 npm run dist:all
+
+# Automated Release & Multiplatform GitHub Publishing:
+# Commits changes, bumps version/tag, pushes to GitHub, and triggers
+# native builds on macOS, Linux, and Windows with GitHub Releases attachment
+npm run release
+```
 ```
 
 Packaged installers and binaries will be generated in the `release/` directory.
