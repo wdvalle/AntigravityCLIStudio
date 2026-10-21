@@ -4,7 +4,7 @@
 
 ![Antigravity CLI Studio](public/icon.png)
 
-**Interface Gráfica Desktop Completa para o Google Antigravity CLI (`agy`) com Estilo Visual Antigravity 2.0**
+**Complete Desktop Graphical Interface for Google Antigravity CLI (`agy`) featuring Antigravity 2.0 Visual Identity**
 
 [![Version](https://img.shields.io/badge/version-1.3.5-blue.svg)](package.json)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](package.json)
@@ -17,91 +17,105 @@
 
 ---
 
-## 📌 Visão Geral
+## 📌 Overview
 
-O **Antigravity CLI Studio** é uma aplicação desktop multiplataforma (macOS, Linux e Windows) criada para proporcionar uma experiência visual moderna e intuitiva ao **Google Antigravity CLI (`agy`)**.
+**Antigravity CLI Studio** is a cross-platform desktop application (macOS, Linux, and Windows) built to provide a modern, intuitive, and feature-rich graphical experience for the **Google Antigravity CLI (`agy`)**.
 
-Inspirado na identidade visual do **Antigravity 2.0 (Obsidian Dark)**, o aplicativo transforma comandos de terminal em controles gráficos ágeis: seleção de modelos por dropdown, ajuste de nível de esforço de raciocínio, controle granular de permissões de ferramentas/comandos, gerenciamento de projetos/workspaces, catálogo de módulos (MCP, Plugins, Agentes, Skills) e editor com as 36 opções de configuração oficial.
-
----
-
-## ✨ Principais Funcionalidades
-
-### 🎨 1. Design & Experiência Antigravity 2.0
-- **Tema Dark Obsidian**: Paleta refinada (`#000000`, `#0B0B0F`, `#121218`) com realces em azul elétrico (`#2F80ED`).
-- **Logo Vetorial Oficial**: Ícone pulsante com animação sutil de atividade.
-- **Layout em 3 Painéis**:
-  - **Sidebar Esquerda**: Histórico de sessões, alternador de workspaces e atalhos rápidos.
-  - **Canvas Central**: Conversação interativa, renderização de blocos de código com destaque de sintaxe e streaming de respostas.
-  - **Painel Auxiliar Direito**: Contexto do projeto, status de conexão, tokens, custos e detalhes de execução.
-
-### 🧠 2. Controle de Modelos e Permissões no Prompt
-- **Seletor de Modelos (`--model`)**: Detecta e lista dinamicamente os modelos disponíveis no `agy` (`Gemini 4 Argon`, `Gemini 3.8 Flash`, `Claude Opus 5.5`, `Claude Sonnet 5.5`, `GPT-OSS 120B`, etc.).
-- **Nível de Esforço de Raciocínio (`--effort`)**: Alternância rápida entre `Low`, `Medium`, `High`, `X-High` e `Max`.
-- **Modo do Agente (`--mode`)**: `Default`, `Auto`, `Accept Edits` e `Plan`.
-- **Políticas de Execução de Comandos (`toolPermission`)**:
-  - `⚡ Automático`: Executa comandos sem confirmação prévia (`--dangerously-skip-permissions`).
-  - `✋ Pedir Permissão`: Exibe cartões interativos de aprovação antes da execução de scripts e ferramentas.
-  - `🔒 Sandbox`: Executa em ambiente isolado no terminal (`--sandbox`).
-  - `🛡️ Modo Estrito`: Exige confirmação explícita para qualquer modificação.
-
-### ⚙️ 3. Central de Configurações (`/config`)
-- Interface completa para gerenciar as **36 opções oficiais do Antigravity CLI**.
-- Sincronização bidirecional em tempo real com `~/.gemini/antigravity-cli/settings.json`.
-- Busca rápida com filtros por categoria (Geral, Agente, Terminal, Políticas de Rede/Arquivo, UI).
-- Alternador entre interface visual amigável e editor JSON bruto.
-
-### 🧩 4. Ecossistema de Módulos e Extensões
-- **Servidores MCP (`agy mcp`)**: Adicionar, remover, habilitar e desabilitar servidores Model Context Protocol.
-- **Plugins (`agy plugin`)**: Instalação, validação, importação e remoção com um clique.
-- **Subagentes (`agy agents`)**: Visualização de agentes especializados e customizados.
-- **Skills & Hooks**: Gestão de habilidades de contexto e automações.
-- **Controle Remoto (`agy remote-control`)**: Iniciar, monitorar status e interromper sessões remotas.
-
-### ⚡ 5. Slash Commands Interativos
-- Menu rápido acessado ao digitar `/` no prompt ou pela barra superior:
-  - `/config`, `/permissions`, `/model`, `/effort`, `/compact`, `/diff`, `/skills`, `/mcp`, `/plugin`, `/agents`, `/hooks`, `/tasks`, `/usage`, `/plan`, `/goal`, `/boost`, `/teamwork`, `/grill-me`, `/learn`, `/schedule`, `/browser`, etc.
+Inspired by the design system of **Antigravity 2.0 (Obsidian Dark)**, the application transforms terminal commands and flags into responsive graphical controls: dynamic model selection, reasoning effort levels, granular command execution policies, workspace/project management, full module catalogs (MCP, Plugins, Agents, Skills), and an editor for all 36 official configuration options.
 
 ---
 
-## 🏗️ Arquitetura do Projeto
+## ✨ Key Features
+
+### 🎨 1. Antigravity 2.0 Design & Resizable Workspace
+- **Obsidian Dark Palette**: High-contrast, sleek theme (`#000000`, `#0B0B0F`, `#121218`) with electric blue accents (`#2F80ED`).
+- **Resizable Multi-Panel Layout**:
+  - **Left Sidebar**: Session history, project/workspace switcher, quick shortcuts (`/compact`, `/rewind`, `/fork`, `/copy`), and module navigation. Resizable with double-click reset (280px).
+  - **Central Canvas**: Real-time conversation stream, monospace prompt responses, syntax-highlighted code blocks, rich Markdown rendering (tables, callout alerts, Mermaid diagrams), and clickable `file://` links.
+  - **Right Auxiliary Pane**: Tabbed interface featuring **CLI & Terminal** (with smart auto-scroll and manual pause), **Artifacts** inspector, and **Session History**. Resizable with double-click reset (340px).
+
+### 🌐 2. Native Internationalization (i18n)
+- **Automatic OS Locale Detection**: Seamlessly queries the native operating system language via Electron IPC (`app.getLocale()`), with browser fallback (`navigator.language`).
+- **Multilingual Support**: Fully localized in **English (`en`)**, **Portuguese (`pt-BR`)**, and **Spanish (`es`)**.
+- **Quick Header Switcher**: Switch language instantly from the top-bar dropdown or leave on `Auto (OS)`. Preferences are persisted in `localStorage`.
+- **Language-Aware LLM Responses**: User queries in any language are preserved—model responses naturally match the language of your prompt.
+
+### 🧠 3. Interactive Prompt Composer & Controls
+- **Dynamic Model Selection (`--model`)**: Detects and displays available models from `agy` (`Gemini 4 Argon`, `Gemini 3.8 Flash`, `Claude Opus 5.5`, `Claude Sonnet 5.5`, `GPT-OSS 120B`, etc.) with integrated reasoning effort indicators (`low`, `medium`, `high`, `xhigh`, `max`).
+- **Prompt History Navigation**: Navigate previous prompts quickly using `Up` and `Down` arrow keys.
+- **Execution Permission Policies (`toolPermission`)**:
+  - `⚡ Automatic`: Executes tools without asking confirmation (`always-proceed` / `--dangerously-skip-permissions`).
+  - `✋ Request Review`: Prompts for user approval before tool execution or file modification (`request-review`).
+  - `🔒 Sandbox`: Runs commands in an isolated terminal sandbox (`proceed-in-sandbox` / `--sandbox`).
+  - `🛡️ Strict`: Requires explicit confirmation for every single step (`strict`).
+- **Agent Modes (`--mode`)**: Switch between `Default`, `Auto`, `Accept Edits`, and `Plan`.
+
+### ⚙️ 4. Configuration Center (`/config`)
+- Comprehensive graphical editor managing all **36 official Antigravity CLI configuration options**.
+- Real-time bidirectional synchronization with `~/.gemini/antigravity-cli/settings.json`.
+- Dual scope management: **Global** vs. **Project-Scoped** (`~/.gemini/config/projects/<id>.json`).
+- Fast category filtering (General, Agent, Terminal, Network, Security/File Access, UI) and search box.
+- Seamless toggle between visual configuration cards and a raw JSON code editor.
+
+### 🧩 5. Extensibility & Modules Ecosystem
+- **MCP Servers (`agy mcp`)**: Add, inspect, enable, disable, and configure Model Context Protocol servers.
+- **Plugins (`agy plugin`)**: One-click install, validate, import, and delete plugins.
+- **Subagents (`agy agents`)**: Survey specialized and custom agent personas.
+- **Skills & Hooks**: Context skills management and automated lifecycle hooks.
+- **Remote Control (`agy remote-control`)**: Start, monitor status, and terminate remote sessions.
+
+### ⚡ 6. Slash Commands & Shortcuts
+- Interactive slash palette triggered by `/` in the prompt or top-bar action buttons:
+  - `/config`, `/permissions`, `/model`, `/effort`, `/compact`, `/rewind`, `/fork`, `/diff`, `/skills`, `/mcp`, `/plugin`, `/agents`, `/hooks`, `/tasks`, `/usage`, `/plan`, `/goal`, `/boost`, `/teamwork`, `/grill-me`, `/learn`, `/schedule`, `/browser`, etc.
+
+---
+
+## 🏗️ Project Architecture
 
 ```
 AntigravityGUI/
-├── electron/                  # Processo Main e Preload do Electron
-│   ├── main.ts                # Inicialização de janelas, menus nativos e ciclo de vida
-│   └── preload.ts             # IPC bridge segura entre Electron e Frontend
-├── server/                    # Servidor local Express (API Bridge)
-│   ├── index.ts               # Rotas REST e WebSocket/SSE para comunicação com o agy
-│   └── agyService.ts          # Abstração de processos, leitura de configs e IPC com CLI
+├── electron/                  # Electron Main Process & Preload
+│   ├── main.ts                # Window creation, native OS locale IPC, lifecycle
+│   └── preload.ts             # Secure IPC bridge between Electron and Frontend
+├── server/                    # Local Express Server (API Bridge)
+│   ├── index.ts               # REST API & SSE streaming endpoints for agy CLI
+│   └── agyService.ts          # Process management, config parser, and CLI runner
 ├── src/                       # Frontend React 19 + TypeScript + Vite
-│   ├── components/            # Componentes visuais modulares
+│   ├── components/            # Modular UI components
 │   │   ├── AntigravityLogo.tsx
-│   │   ├── CliModulesView.tsx # Telas para MCP, Plugins, Agentes e Skills
-│   │   ├── ConfigView.tsx     # Central de Configuração das 36 opções
-│   │   └── ProjectModal.tsx   # Modal de gerenciamento de workspaces
-│   ├── services/              # Camada de comunicação com a API local
-│   ├── styles/                # Folhas de estilo (tema Obsidian Dark)
-│   ├── types/                 # Interfaces e definições de tipos TypeScript
-│   ├── App.tsx                # Layout principal e orquestração de estados
-│   └── main.tsx               # Entrypoint do React
-├── public/                    # Assets estáticos e ícones
-├── package.json               # Dependências e scripts de automação
-├── tsconfig.json              # Configuração TypeScript do Frontend
-├── tsconfig.electron.json     # Configuração TypeScript do Electron/Server
-└── vite.config.ts             # Configuração do Vite Bundler
+│   │   ├── CliModulesView.tsx # Views for MCP, Plugins, Agents, and Skills
+│   │   ├── ConfigView.tsx     # 36-option Configuration Center
+│   │   ├── MarkdownRenderer.tsx # GitHub-style Markdown & file link parser
+│   │   └── ProjectModal.tsx   # Workspace creation & project settings modal
+│   ├── i18n/                  # Complete Internationalization System
+│   │   ├── locales/
+│   │   │   ├── en.ts          # English translations
+│   │   │   ├── es.ts          # Spanish translations
+│   │   │   └── pt-BR.ts       # Portuguese (Brazil) translations
+│   │   ├── index.tsx          # I18nProvider, useI18n hook, and OS detection
+│   │   └── types.ts           # Strictly typed TranslationSchema
+│   ├── services/              # API communication layer
+│   ├── styles/                # Stylesheets (Obsidian Dark Antigravity 2.0)
+│   ├── types/                 # TypeScript type definitions
+│   ├── App.tsx                # Main layout, resize handlers, and chat orchestration
+│   └── main.tsx               # React application entrypoint
+├── public/                    # Static assets and icons
+├── package.json               # Dependencies and scripts
+├── tsconfig.json              # Frontend TypeScript configuration
+├── tsconfig.electron.json     # Electron & Server TypeScript configuration
+└── vite.config.ts             # Vite bundler configuration
 ```
 
 ---
 
-## 🚀 Como Iniciar
+## 🚀 Getting Started
 
-### Pré-requisitos
-- **Node.js** (v18.0.0 ou superior)
-- **npm** ou **yarn**
-- **Google Antigravity CLI (`agy`)** instalado e configurado no PATH do sistema
+### Prerequisites
+- **Node.js** (v18.0.0 or higher)
+- **npm** or **yarn**
+- **Google Antigravity CLI (`agy`)** installed and available in your system `PATH`
 
-### 1. Clonar e Instalar Dependências
+### 1. Clone and Install Dependencies
 
 ```bash
 git clone https://github.com/walterdovalle/AntigravityGUI.git
@@ -109,59 +123,60 @@ cd AntigravityGUI
 npm install
 ```
 
-### 2. Modo Desenvolvimento
+### 2. Development Mode
 
-#### Executar como Aplicativo Desktop (Recomendado):
-Inicia simultaneamente o servidor backend local, o servidor Vite de desenvolvimento e a janela do Electron com Hot Reload:
+#### Run as Desktop Application (Recommended):
+Starts the local backend server, Vite dev server, and Electron window with Hot Module Replacement (HMR):
 ```bash
 npm run app
 ```
 
-#### Executar apenas no Navegador (Web Mode):
+#### Run in Web Browser Only:
 ```bash
 npm run dev
 ```
-O frontend estará acessível em `http://localhost:5173`.
+The web frontend will be accessible at `http://localhost:5173`.
 
 ---
 
-## 📦 Compilação e Empacotamento
+## 📦 Build & Packaging
 
-O projeto utiliza `electron-builder` pré-configurado para gerar instaladores otimizados para cada sistema operacional:
+The project is preconfigured with `electron-builder` to generate optimized installers for each operating system:
 
 ```bash
-# Compilar TypeScript do frontend e do backend
+# Compile TypeScript for both frontend (Vite) and Electron/server
 npm run build
 
-# Gerar instalador para macOS (.dmg e .zip)
+# Package installer for macOS (.dmg and .zip)
 npm run dist:mac
 
-# Gerar instaladores para Linux (.AppImage, .deb, .tar.gz)
+# Package installers for Linux (.AppImage, .deb, .tar.gz)
 npm run dist:linux
 
-# Gerar instaladores para Windows (.exe NSIS, Portable, .zip)
+# Package installers for Windows (.exe NSIS, Portable, .zip)
 npm run dist:win
 
-# Compilar para todas as plataformas de uma vez
+# Build packages for all target platforms
 npm run dist:all
 ```
 
-Os arquivos finais serão gerados no diretório `release/`.
+Packaged installers and binaries will be generated in the `release/` directory.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 🛠️ Tech Stack
 
 - **Desktop Framework**: [Electron 34](https://www.electronjs.org/)
 - **UI Framework**: [React 19](https://react.dev/)
 - **Bundler**: [Vite 6](https://vitejs.dev/)
-- **Linguagem**: [TypeScript 5.7](https://www.typescriptlang.org/)
-- **Backend Local**: [Express 4](https://expressjs.com/) + [Node.js](https://nodejs.org/)
-- **Ícones**: [Lucide React](https://lucide.dev/)
-- **Empacotador**: [electron-builder 25](https://www.electron.build/)
+- **Language**: [TypeScript 5.7](https://www.typescriptlang.org/)
+- **Local Backend**: [Express 4](https://expressjs.com/) + [Node.js](https://nodejs.org/)
+- **Icons**: [Lucide React](https://lucide.dev/)
+- **Markdown & Highlighting**: [react-markdown](https://github.com/remarkjs/react-markdown), [remark-gfm](https://github.com/remarkjs/remark-gfm), [rehype-highlight](https://github.com/rehypejs/rehype-highlight)
+- **Packaging**: [electron-builder 25](https://www.electron.build/)
 
 ---
 
-## 📄 Licença
+## 📄 License
 
-Este projeto é distribuído sob a licença **MIT**. Consulte o arquivo [`package.json`](package.json) para mais detalhes.
+This project is licensed under the **MIT License**. See [`package.json`](package.json) for details.
