@@ -43,6 +43,7 @@ import { AntigravityLogo } from './components/AntigravityLogo';
 import { ConfigView } from './components/ConfigView';
 import { CliModulesView } from './components/CliModulesView';
 import { ProjectModal } from './components/ProjectModal';
+import { MarkdownRenderer } from './components/MarkdownRenderer';
 import {
   AgyModelInfo,
   AgySettings,
@@ -1761,6 +1762,8 @@ export const App: React.FC = () => {
                                 <span className="dot" />
                                 <span>Executando no Antigravity CLI...</span>
                               </div>
+                            ) : msg.role === 'assistant' ? (
+                              <MarkdownRenderer content={msg.content} />
                             ) : (
                               <pre className="agy-message-text">{msg.content}</pre>
                             )}

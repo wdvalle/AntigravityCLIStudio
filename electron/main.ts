@@ -65,6 +65,19 @@ ipcMain.handle('agy:getBackendUrl', () => {
   return `http://127.0.0.1:${BACKEND_PORT}`;
 });
 
+ipcMain.handle('agy:openExternal', async (_, url: string) => {
+  if (url) {
+    await shell.openExternal(url);
+  }
+});
+
+ipcMain.handle('agy:openPath', async (_, filePath: string) => {
+  if (filePath) {
+    const clean = filePath.replace(/^file:\/\//, '');
+    await shell.openPath(clean);
+  }
+});
+
 app.whenReady().then(() => {
   createMainWindow();
 

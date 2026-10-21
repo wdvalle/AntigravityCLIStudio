@@ -7,6 +7,8 @@ declare global {
       platform: string;
       selectDirectory: () => Promise<string | null>;
       getBackendUrl: () => Promise<string>;
+      openExternal?: (url: string) => Promise<void>;
+      openPath?: (path: string) => Promise<void>;
     };
   }
 }
